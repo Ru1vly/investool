@@ -12,4 +12,7 @@ add_executable(investool
     FinancialCalculator.cpp
     RiskAnalyzer.cpp
     AssetClassifier.cpp
+    PortfolioOptimizer.cpp
+    StrategyBacktester.cpp
+    RatioAnalyzer.cpp
 )

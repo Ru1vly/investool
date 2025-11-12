@@ -132,6 +132,132 @@ public:
      * Annual = Monthly * √12
      */
     static double MonthlyToAnnualVolatility(double monthlyVolatility);
+
+    /**
+     * Formula 8: Calculate Correlation Coefficient (ρ)
+     *
+     * ρ = Cov(A, B) / (σ_A × σ_B)
+     *
+     * Measures the degree to which two assets move in relation to each other.
+     * Range: -1 (perfect inverse) to +1 (perfect positive correlation)
+     *
+     * @param returns1 First asset returns
+     * @param returns2 Second asset returns
+     * @return Correlation coefficient
+     */
+    static double CalculateCorrelation(const std::vector<double>& returns1,
+                                       const std::vector<double>& returns2);
+
+    /**
+     * Formula 9: Calculate Two-Asset Portfolio Volatility
+     *
+     * σ_p = √[w_A² × σ_A² + w_B² × σ_B² + 2 × w_A × w_B × ρ_AB × σ_A × σ_B]
+     *
+     * Calculates portfolio risk accounting for diversification effects.
+     *
+     * @param weight1 Weight of first asset (0.0 to 1.0)
+     * @param sigma1 Volatility of first asset
+     * @param weight2 Weight of second asset (0.0 to 1.0)
+     * @param sigma2 Volatility of second asset
+     * @param correlation Correlation coefficient between assets
+     * @return Portfolio volatility
+     */
+    static double CalculatePortfolioVolatility(double weight1, double sigma1,
+                                               double weight2, double sigma2,
+                                               double correlation);
+
+    /**
+     * Formula 10: Calculate Downside Deviation (σ_d)
+     *
+     * σ_d = √[Σ min(0, R_i - MARR)² / n]
+     *
+     * Measures only negative volatility (downside risk).
+     *
+     * @param returns Vector of returns
+     * @param MARR Minimum Acceptable Rate of Return (default: 0.0)
+     * @return Downside deviation
+     */
+    static double CalculateDownsideDeviation(const std::vector<double>& returns,
+                                             double MARR = 0.0);
+
+    /**
+     * Formula 11: Calculate Sortino Ratio
+     *
+     * Sortino = (R_p - R_f) / σ_d
+     *
+     * Risk-adjusted return using only downside deviation.
+     * Better measure than Sharpe for asymmetric returns.
+     *
+     * Interpretation (similar to Sharpe):
+     * - < 1.0: Poor - downside risk not worth it
+     * - 1.0 - 1.99: Good - adequately compensated
+     * - ≥ 2.0: Excellent - well compensated
+     *
+     * @param returns Vector of returns
+     * @param riskFreeRate Risk-free rate
+     * @param MARR Minimum Acceptable Rate of Return (default: risk-free rate)
+     * @return Sortino Ratio
+     *
+     * Source: Frank A. Sortino and Robert van der Meer (1991)
+     */
+    static double CalculateSortinoRatio(const std::vector<double>& returns,
+                                        double riskFreeRate,
+                                        double MARR = -999.0);
+
+    /**
+     * Formula 12: Calculate Value at Risk (VaR) - Parametric Method
+     *
+     * VaR = |μ - Z × σ|
+     *
+     * Quantifies potential loss at a given confidence level.
+     *
+     * @param portfolioValue Total portfolio value ($)
+     * @param volatility Portfolio volatility (for the period)
+     * @param confidenceLevel Confidence level (0.90, 0.95, or 0.99)
+     * @param expectedReturn Expected return for period (default: 0.0)
+     * @return Value at Risk in dollars
+     *
+     * Source: J.P. Morgan RiskMetrics (1996)
+     */
+    static double CalculateVaR(double portfolioValue,
+                               double volatility,
+                               double confidenceLevel,
+                               double expectedReturn = 0.0);
+
+    /**
+     * Calculate Historical Value at Risk
+     *
+     * More robust than parametric VaR as it doesn't assume normal distribution.
+     * Uses actual historical returns to find loss at confidence level.
+     *
+     * @param returns Historical portfolio returns
+     * @param portfolioValue Total portfolio value ($)
+     * @param confidenceLevel Confidence level (e.g., 0.95 for 95%)
+     * @return Value at Risk in dollars
+     */
+    static double CalculateHistoricalVaR(const std::vector<double>& returns,
+                                         double portfolioValue,
+                                         double confidenceLevel);
+
+    /**
+     * Formula 13: Calculate Z-Score
+     *
+     * Z = (x - μ) / σ
+     *
+     * Measures how many standard deviations an observation is from the mean.
+     *
+     * Interpretation:
+     * - |Z| < 1: Within normal range
+     * - |Z| < 2: Moderate deviation
+     * - |Z| < 3: Significant deviation
+     * - |Z| ≥ 3: Extreme deviation (very rare)
+     *
+     * @param currentValue Current observation
+     * @param historicalData Historical data series
+     * @return Z-Score
+     */
+    static double CalculateZScore(double currentValue,
+                                  const std::vector<double>& historicalData);
 };
 
 #endif // RISK_ANALYZER_H
