@@ -7,4 +7,9 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Add executable
-add_executable(investool main.cpp)
+add_executable(investool
+    main.cpp
+    FinancialCalculator.cpp
+    RiskAnalyzer.cpp
+    AssetClassifier.cpp
+)
