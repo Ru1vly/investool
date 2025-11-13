@@ -66,3 +66,13 @@ docker-compose.override.yml
 # Logs
 *.log
 logs/
+
+# Secrets (NEVER COMMIT!)
+secrets.txt
+k8s/secrets.yaml
+k8s/secrets.yaml.backup
+
+# Deployment artifacts
+build-info.txt
+deployment-info.txt
+validation-report.txt
