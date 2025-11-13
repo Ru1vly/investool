@@ -38,8 +38,9 @@ class AgentState:
     # ==================== Calculation Agent ====================
     calculation_plan: str = ""
     calculation_results: Dict[str, float] = field(default_factory=dict)
-    calculation_code: str = ""
+    calculation_code: str = ""  # Legacy field (now stores C++ function names)
     calculation_error: Optional[str] = None
+    calculation_html_packet: Optional[Any] = None  # EnrichedDataPacket from C++ engine
 
     # ==================== Narrative Agent ====================
     macro_plan_json: Dict[str, Any] = field(default_factory=dict)
