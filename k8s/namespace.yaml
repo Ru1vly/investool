@@ -1,0 +1,12 @@
+# ============================================================================
+# Kubernetes Namespace for FinRisk AI
+# ============================================================================
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: finrisk-ai
+  labels:
+    name: finrisk-ai
+    app.kubernetes.io/name: finrisk-ai
+    app.kubernetes.io/part-of: financial-analysis-platform
