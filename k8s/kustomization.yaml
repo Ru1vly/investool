@@ -15,7 +15,7 @@ namespace: finrisk-ai
 resources:
   - namespace.yaml
   - configmap.yaml
-  # - secrets.yaml  # Create from template first!
+  - secrets.yaml
   - postgres-deployment.yaml
   - redis-deployment.yaml
   - neo4j-deployment.yaml

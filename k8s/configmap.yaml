@@ -37,3 +37,11 @@ data:
   # Performance Tuning
   MAX_WORKERS: "4"
   RATE_LIMIT_PER_MINUTE: "60"
+
+  # Phase 5: Fine-Tuning & Data Collection
+  ENABLE_DATA_COLLECTION: "true"
+  DATA_COLLECTION_QUALITY: "0.9"
+  ENABLE_FINETUNING: "false"
+  ENABLE_AB_TESTING: "false"
+  AB_TEST_TRAFFIC_SPLIT: "0.5"
+  # FINETUNED_MODEL_NAME is in secrets (contains model ID)
