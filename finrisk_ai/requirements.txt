@@ -1,0 +1,44 @@
+# Core AI/ML Framework
+google-generativeai>=0.3.0
+langgraph>=0.0.40
+langchain>=0.1.0
+langchain-google-genai>=0.0.5
+
+# Memory System (Mem0)
+mem0ai>=0.0.5
+
+# Vector Database & RAG
+pgvector>=0.2.0
+psycopg2-binary>=2.9.0
+chromadb>=0.4.0
+sentence-transformers>=2.2.0
+
+# Hybrid Search & Reranking
+rank-bm25>=0.2.2
+cross-encoder>=0.1.0
+
+# GraphRAG
+networkx>=3.0
+py2neo>=2021.2.3
+
+# Data Processing
+pandas>=2.0.0
+numpy>=1.24.0
+pydantic>=2.0.0
+
+# Visualization (for charts)
+altair>=5.0.0
+vega>=3.0.0
+
+# Security (for code execution sandbox)
+RestrictedPython>=6.0
+
+# API & Web
+fastapi>=0.104.0
+uvicorn>=0.24.0
+httpx>=0.25.0
+
+# Utilities
+python-dotenv>=1.0.0
+redis>=5.0.0
+tenacity>=8.2.0
