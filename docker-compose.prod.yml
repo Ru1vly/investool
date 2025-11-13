@@ -1,0 +1,192 @@
+# ============================================================================
+# Docker Compose Production Override
+#
+# Extends docker-compose.yml with production-specific settings.
+#
+# Usage:
+#   docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ==========================================================================
+  # FinRisk AI API - Production Overrides
+  # ==========================================================================
+  finrisk-api:
+    # Use specific version tag (not latest)
+    image: finrisk-ai:1.0.0
+
+    # Production environment variables
+    environment:
+      - DEBUG=false
+      - LOG_LEVEL=warning
+      - PYTHONUNBUFFERED=1
+
+    # Disable development volume mounts
+    volumes: []
+
+    # Production restart policy
+    restart: always
+
+    # Resource limits (adjust based on your needs)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+      replicas: 3
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ==========================================================================
+  # PostgreSQL - Production Overrides
+  # ==========================================================================
+  postgres:
+    # Production restart policy
+    restart: always
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.25'
+          memory: 512M
+
+    # Logging
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Additional PostgreSQL tuning
+    command:
+      - postgres
+      - -c
+      - shared_buffers=512MB
+      - -c
+      - effective_cache_size=1536MB
+      - -c
+      - maintenance_work_mem=128MB
+      - -c
+      - checkpoint_completion_target=0.9
+      - -c
+      - wal_buffers=16MB
+      - -c
+      - default_statistics_target=100
+      - -c
+      - random_page_cost=1.1
+      - -c
+      - effective_io_concurrency=200
+      - -c
+      - work_mem=2621kB
+      - -c
+      - min_wal_size=1GB
+      - -c
+      - max_wal_size=4GB
+      - -c
+      - max_worker_processes=4
+      - -c
+      - max_parallel_workers_per_gather=2
+      - -c
+      - max_parallel_workers=4
+      - -c
+      - max_parallel_maintenance_workers=2
+
+  # ==========================================================================
+  # Redis - Production Overrides
+  # ==========================================================================
+  redis:
+    restart: always
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+        reservations:
+          cpus: '0.1'
+          memory: 256M
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Additional Redis configuration
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:-}
+      --maxmemory 768mb
+      --maxmemory-policy allkeys-lru
+      --save 900 1
+      --save 300 10
+      --save 60 10000
+
+  # ==========================================================================
+  # Neo4j - Production Overrides
+  # ==========================================================================
+  neo4j:
+    restart: always
+
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '0.5'
+          memory: 2G
+
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+    # Additional Neo4j tuning
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-finrisk_neo4j_password}
+      - NEO4J_dbms_memory_heap_max__size=3G
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_dbms_connector_bolt_thread__pool__max__size=400
+      - NEO4J_dbms_connector_bolt_thread__pool__keep__alive=5m
+
+# ============================================================================
+# Production Usage:
+#
+# 1. Set production environment variables:
+#    cp .env.example .env.production
+#    # Edit .env.production with production values
+#
+# 2. Start services:
+#    docker-compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.production up -d
+#
+# 3. View logs:
+#    docker-compose -f docker-compose.yml -f docker-compose.prod.yml logs -f
+#
+# 4. Scale API:
+#    docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d --scale finrisk-api=5
+#
+# 5. Stop services:
+#    docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
+# ============================================================================

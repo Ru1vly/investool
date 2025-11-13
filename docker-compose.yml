@@ -1,0 +1,214 @@
+# ============================================================================
+# Docker Compose Configuration for FinRisk AI Analyst
+#
+# Services:
+# - finrisk-api: Main FastAPI application (C++ + AI)
+# - postgres: PostgreSQL with pgvector for Mem0 + RAG storage
+# - redis: Redis for caching and session management
+# - neo4j: Neo4j for GraphRAG knowledge graph
+#
+# Usage:
+#   Development: docker-compose up
+#   Production:  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#   Stop:        docker-compose down
+#   Cleanup:     docker-compose down -v  (removes volumes)
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ==========================================================================
+  # FinRisk AI API Service
+  # ==========================================================================
+  finrisk-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: finrisk-api
+    ports:
+      - "8000:8000"
+    environment:
+      # Gemini AI Configuration (REQUIRED)
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_PRO_MODEL=${GEMINI_PRO_MODEL:-gemini-1.5-pro-latest}
+      - GEMINI_FLASH_MODEL=${GEMINI_FLASH_MODEL:-gemini-1.5-flash-latest}
+
+      # Database Configuration
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB:-finrisk_db}
+      - POSTGRES_USER=${POSTGRES_USER:-finrisk_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-finrisk_password}
+
+      # Redis Configuration
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+
+      # Neo4j Configuration
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=${NEO4J_USER:-neo4j}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-finrisk_neo4j_password}
+
+      # Application Configuration
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - PORT=8000
+      - DEBUG=${DEBUG:-false}
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import requests; requests.get('http://localhost:8000/health').raise_for_status()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    volumes:
+      # Mount source code for development (comment out for production)
+      - ./finrisk_ai:/app/finrisk_ai:ro
+      # Mount build directory for C++ module
+      - ./build:/app/build:ro
+    networks:
+      - finrisk-network
+    restart: unless-stopped
+
+  # ==========================================================================
+  # PostgreSQL with pgvector Extension
+  # ==========================================================================
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: finrisk-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-finrisk_db}
+      - POSTGRES_USER=${POSTGRES_USER:-finrisk_user}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-finrisk_password}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-finrisk_user} -d ${POSTGRES_DB:-finrisk_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    networks:
+      - finrisk-network
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Redis for Caching
+  # ==========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: finrisk-redis
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --appendonly yes
+      --requirepass ${REDIS_PASSWORD:-}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - finrisk-network
+    restart: unless-stopped
+
+  # ==========================================================================
+  # Neo4j for GraphRAG
+  # ==========================================================================
+  neo4j:
+    image: neo4j:5-community
+    container_name: finrisk-neo4j
+    ports:
+      - "7474:7474"  # HTTP
+      - "7687:7687"  # Bolt
+    environment:
+      - NEO4J_AUTH=${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-finrisk_neo4j_password}
+      - NEO4J_dbms_memory_heap_max__size=2G
+      - NEO4J_dbms_memory_pagecache_size=1G
+      - NEO4J_PLUGINS=["apoc", "graph-data-science"]
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_plugins:/plugins
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "${NEO4J_USER:-neo4j}", "-p", "${NEO4J_PASSWORD:-finrisk_neo4j_password}", "RETURN 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+    networks:
+      - finrisk-network
+    restart: unless-stopped
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  finrisk-network:
+    driver: bridge
+    name: finrisk-network
+
+# ============================================================================
+# Volumes for Data Persistence
+# ============================================================================
+volumes:
+  postgres_data:
+    name: finrisk-postgres-data
+  redis_data:
+    name: finrisk-redis-data
+  neo4j_data:
+    name: finrisk-neo4j-data
+  neo4j_logs:
+    name: finrisk-neo4j-logs
+  neo4j_plugins:
+    name: finrisk-neo4j-plugins
+
+# ============================================================================
+# Usage Examples:
+#
+# 1. Start all services (development):
+#    docker-compose up
+#
+# 2. Start in background:
+#    docker-compose up -d
+#
+# 3. View logs:
+#    docker-compose logs -f finrisk-api
+#
+# 4. Stop services:
+#    docker-compose down
+#
+# 5. Stop and remove volumes (WARNING: deletes all data):
+#    docker-compose down -v
+#
+# 6. Rebuild after code changes:
+#    docker-compose up --build
+#
+# 7. Access services:
+#    - API:       http://localhost:8000/docs
+#    - Postgres:  postgresql://localhost:5432/finrisk_db
+#    - Redis:     redis://localhost:6379
+#    - Neo4j UI:  http://localhost:7474
+#
+# 8. Environment variables:
+#    Create .env file with:
+#      GEMINI_API_KEY=your_key_here
+#      POSTGRES_PASSWORD=secure_password
+#      NEO4J_PASSWORD=secure_password
+# ============================================================================

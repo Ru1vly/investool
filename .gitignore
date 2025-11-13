@@ -51,4 +51,18 @@ __pycache__/
 env/
 venv/
 .env
+.env.local
+.env.*.local
 .venv
+
+# Docker
+docker-compose.override.yml
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs
+*.log
+logs/

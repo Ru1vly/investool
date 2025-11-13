@@ -1,0 +1,111 @@
+# ============================================================================
+# Docker Build Ignore File
+#
+# Excludes unnecessary files from Docker build context for faster builds.
+# ============================================================================
+
+# Git
+.git/
+.gitignore
+.gitattributes
+.gitmodules
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+.travis.yml
+
+# Documentation
+*.md
+docs/
+*.pdf
+
+# IDE and Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.env
+.env.local
+.env.*.local
+.venv
+
+# Build directories
+cmake-build-*/
+build/
+CMakeCache.txt
+CMakeFiles/
+
+# Test files (keep test_*.py but exclude test results)
+test_*.txt
+test_results/
+htmlcov/
+
+# Docker
+docker-compose*.yml
+Dockerfile*
+.dockerignore
+
+# Kubernetes
+k8s/
+*.yaml
+
+# Logs
+*.log
+logs/
+
+# Database files (should not be in image)
+*.db
+*.sqlite
+*.sqlite3
+
+# Large data files
+data/
+datasets/
+models/
+*.csv
+*.json
+*.parquet
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Scripts
+scripts/

@@ -1,0 +1,57 @@
+# ============================================================================
+# Kustomize Configuration for FinRisk AI
+#
+# Allows easy deployment of all Kubernetes resources.
+#
+# Usage:
+#   kubectl apply -k k8s/
+# ============================================================================
+
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: finrisk-ai
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  # - secrets.yaml  # Create from template first!
+  - postgres-deployment.yaml
+  - redis-deployment.yaml
+  - neo4j-deployment.yaml
+  - api-deployment.yaml
+  - ingress.yaml
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/name: finrisk-ai
+  app.kubernetes.io/version: "1.0.0"
+  app.kubernetes.io/managed-by: kustomize
+
+# Images (update with your container registry)
+images:
+  - name: finrisk-ai
+    newName: your-registry/finrisk-ai
+    newTag: latest
+
+# ============================================================================
+# Deployment Instructions:
+#
+# 1. Create secrets from template:
+#    cp secrets.yaml.template secrets.yaml
+#    # Edit secrets.yaml with base64-encoded values
+#    # Uncomment the secrets.yaml line above
+#
+# 2. Deploy to Kubernetes:
+#    kubectl apply -k k8s/
+#
+# 3. Verify deployment:
+#    kubectl get all -n finrisk-ai
+#
+# 4. Check logs:
+#    kubectl logs -n finrisk-ai -l app=finrisk-api -f
+#
+# 5. Access API:
+#    kubectl port-forward -n finrisk-ai svc/finrisk-api-service 8000:80
+#    # Then visit: http://localhost:8000/docs
+# ============================================================================
