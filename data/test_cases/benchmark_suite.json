@@ -1,0 +1,122 @@
+[
+  {
+    "id": "test_001",
+    "name": "Calculate Sharpe Ratio",
+    "query": "Calculate the Sharpe ratio for a portfolio with monthly returns of 5%, -2%, 3%, 8%, -1%, 4%, 2%, 6%, -3%, 5%. Assume a risk-free rate of 2% annually.",
+    "expected_output": "The Sharpe ratio is approximately 1.42, indicating good risk-adjusted returns.",
+    "required_keywords": ["sharpe", "ratio", "risk", "return"],
+    "min_words": 100
+  },
+  {
+    "id": "test_002",
+    "name": "Portfolio Volatility",
+    "query": "What is the volatility of a portfolio with the following monthly returns: 2%, -1%, 3%, 1%, -2%, 4%?",
+    "expected_output": "The portfolio volatility (standard deviation) is approximately 2.16%.",
+    "required_keywords": ["volatility", "standard deviation", "risk"],
+    "min_words": 80
+  },
+  {
+    "id": "test_003",
+    "name": "Value at Risk",
+    "query": "Calculate the 95% Value at Risk for a $100,000 portfolio with monthly returns: 3%, -2%, 5%, 1%, -4%, 6%, 2%, -1%, 4%, 3%.",
+    "expected_output": "The 95% VaR is approximately $4,200, meaning there's a 5% chance of losing more than this amount.",
+    "required_keywords": ["var", "value at risk", "loss"],
+    "min_words": 100
+  },
+  {
+    "id": "test_004",
+    "name": "Sortino Ratio",
+    "query": "Explain the Sortino ratio and calculate it for returns of 8%, -3%, 5%, 10%, -2%, 6% with a target return of 5% annually and risk-free rate of 2%.",
+    "expected_output": "The Sortino ratio focuses only on downside volatility. For this portfolio, it's approximately 1.85.",
+    "required_keywords": ["sortino", "downside", "risk"],
+    "min_words": 120
+  },
+  {
+    "id": "test_005",
+    "name": "Portfolio Optimization",
+    "query": "I have 3 assets: Stock A (returns: 10%, 8%, 12%), Stock B (returns: 5%, 6%, 4%), Stock C (returns: 8%, 9%, 7%). How should I allocate my portfolio to maximize Sharpe ratio?",
+    "expected_output": "The optimal portfolio allocation is approximately 60% Stock A, 25% Stock C, and 15% Stock B.",
+    "required_keywords": ["allocation", "optimal", "portfolio"],
+    "min_words": 150
+  },
+  {
+    "id": "test_006",
+    "name": "Beta Calculation",
+    "query": "Calculate the beta of my portfolio (returns: 5%, -2%, 8%, 3%, -1%, 6%) against the market (returns: 4%, -1%, 6%, 2%, 0%, 5%).",
+    "expected_output": "The beta is approximately 1.15, indicating the portfolio is slightly more volatile than the market.",
+    "required_keywords": ["beta", "market", "volatility"],
+    "min_words": 100
+  },
+  {
+    "id": "test_007",
+    "name": "Correlation Analysis",
+    "query": "What is the correlation between Asset A (returns: 10%, 5%, 8%, 6%, 12%) and Asset B (returns: 8%, 6%, 7%, 5%, 9%)?",
+    "expected_output": "The correlation is approximately 0.85, indicating a strong positive relationship.",
+    "required_keywords": ["correlation", "relationship"],
+    "min_words": 80
+  },
+  {
+    "id": "test_008",
+    "name": "Maximum Drawdown",
+    "query": "Calculate the maximum drawdown for a portfolio with cumulative returns: 10%, 15%, 12%, 18%, 14%, 20%, 16%.",
+    "expected_output": "The maximum drawdown is approximately 4.3%, occurring between the peak of 20% and the trough at 16%.",
+    "required_keywords": ["drawdown", "peak", "loss"],
+    "min_words": 100
+  },
+  {
+    "id": "test_009",
+    "name": "Expected Return",
+    "query": "Calculate the expected return of a portfolio with 40% allocation to bonds (5% return), 50% to stocks (10% return), and 10% to cash (2% return).",
+    "expected_output": "The expected portfolio return is 7.2% (0.4×5% + 0.5×10% + 0.1×2%).",
+    "required_keywords": ["expected", "return", "weighted"],
+    "min_words": 80
+  },
+  {
+    "id": "test_010",
+    "name": "Risk-Adjusted Performance",
+    "query": "Compare two portfolios: Portfolio A has 12% return with 15% volatility. Portfolio B has 10% return with 8% volatility. Which is better from a risk-adjusted perspective? Assume 2% risk-free rate.",
+    "expected_output": "Portfolio A has a Sharpe ratio of 0.67, while Portfolio B has 1.00. Portfolio B offers better risk-adjusted returns.",
+    "required_keywords": ["sharpe", "risk-adjusted", "comparison"],
+    "min_words": 120
+  },
+  {
+    "id": "test_011",
+    "name": "Diversification Benefit",
+    "query": "Explain the benefits of diversification and calculate the portfolio variance for two assets: Asset A (variance 0.04, weight 60%), Asset B (variance 0.09, weight 40%), correlation 0.3.",
+    "expected_output": "Diversification reduces risk. The portfolio variance is 0.0348, lower than the weighted average of individual variances.",
+    "required_keywords": ["diversification", "variance", "risk reduction"],
+    "min_words": 150
+  },
+  {
+    "id": "test_012",
+    "name": "Information Ratio",
+    "query": "Calculate the Information Ratio for an actively managed fund with returns: 8%, 10%, 6%, 12%, 9% compared to benchmark returns: 7%, 8%, 5%, 10%, 8%.",
+    "expected_output": "The Information Ratio is approximately 1.2, indicating good excess returns relative to tracking error.",
+    "required_keywords": ["information ratio", "tracking", "active"],
+    "min_words": 100
+  },
+  {
+    "id": "test_013",
+    "name": "Compound Annual Growth Rate",
+    "query": "My investment grew from $10,000 to $15,000 over 5 years. What's the Compound Annual Growth Rate (CAGR)?",
+    "expected_output": "The CAGR is approximately 8.45% per year.",
+    "required_keywords": ["cagr", "growth", "annual"],
+    "min_words": 60
+  },
+  {
+    "id": "test_014",
+    "name": "Break-Even Analysis",
+    "query": "I'm down 20% on my investment. What return do I need to break even?",
+    "expected_output": "You need a 25% return to break even from a 20% loss.",
+    "required_keywords": ["break even", "return", "loss"],
+    "min_words": 50
+  },
+  {
+    "id": "test_015",
+    "name": "Monte Carlo Risk Assessment",
+    "query": "Explain how Monte Carlo simulation can be used to assess portfolio risk and what insights it provides.",
+    "expected_output": "Monte Carlo simulation runs thousands of scenarios to model potential portfolio outcomes, providing probability distributions of returns and risk metrics.",
+    "required_keywords": ["monte carlo", "simulation", "probability"],
+    "min_words": 120
+  }
+]
