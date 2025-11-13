@@ -41,7 +41,7 @@ from finrisk_ai.api.schemas import (
     CalculationResults,
     ReportMetadata
 )
-from finrisk_ai.core.orchestrator import FinRiskOrchestrator
+from finrisk_ai.core.orchestrator_v2 import FinRiskOrchestratorV2
 from finrisk_ai.rag.hybrid_search import Document
 
 # Configure logging
@@ -55,8 +55,8 @@ logger = logging.getLogger(__name__)
 # Global State (Singleton Orchestrator)
 # ============================================================================
 
-# Orchestrator instance (initialized on startup)
-orchestrator: Optional[FinRiskOrchestrator] = None
+# Orchestrator instance (initialized on startup) - Using V2 with Phase 5 capabilities
+orchestrator: Optional[FinRiskOrchestratorV2] = None
 
 
 @asynccontextmanager
@@ -85,16 +85,36 @@ async def lifespan(app: FastAPI):
         )
 
     try:
-        # Initialize orchestrator (creates all agents, RAG, memory systems)
-        logger.info("Initializing FinRiskOrchestrator...")
+        # Initialize orchestrator V2 (Phase 5: with fine-tuning capabilities)
+        logger.info("Initializing FinRiskOrchestratorV2 (Phase 5)...")
 
-        orchestrator = FinRiskOrchestrator(
+        # Phase 5 configuration from environment
+        enable_data_collection = os.getenv("ENABLE_DATA_COLLECTION", "true").lower() == "true"
+        enable_finetuning = os.getenv("ENABLE_FINETUNING", "false").lower() == "true"
+        finetuned_model = os.getenv("FINETUNED_MODEL_NAME")
+        enable_ab_testing = os.getenv("ENABLE_AB_TESTING", "false").lower() == "true"
+        ab_test_split = float(os.getenv("AB_TEST_TRAFFIC_SPLIT", "0.5"))
+
+        orchestrator = FinRiskOrchestratorV2(
             gemini_api_key=gemini_api_key or "dummy_key_for_health_check",
             gemini_pro_model=os.getenv("GEMINI_PRO_MODEL", "gemini-1.5-pro-latest"),
-            gemini_flash_model=os.getenv("GEMINI_FLASH_MODEL", "gemini-1.5-flash-latest")
+            gemini_flash_model=os.getenv("GEMINI_FLASH_MODEL", "gemini-1.5-flash-latest"),
+            # Phase 5 settings
+            enable_data_collection=enable_data_collection,
+            data_collection_quality_threshold=float(os.getenv("DATA_COLLECTION_QUALITY", "0.9")),
+            finetuned_model=finetuned_model,
+            enable_finetuning=enable_finetuning,
+            enable_ab_testing=enable_ab_testing,
+            ab_test_traffic_split=ab_test_split,
         )
 
-        logger.info("✅ FinRiskOrchestrator initialized successfully")
+        logger.info("✅ FinRiskOrchestratorV2 initialized successfully")
+        logger.info(f"   → Data collection: {'ENABLED' if enable_data_collection else 'DISABLED'}")
+        logger.info(f"   → Fine-tuning: {'ENABLED' if enable_finetuning else 'DISABLED'}")
+        if finetuned_model:
+            logger.info(f"   → Fine-tuned model: {finetuned_model}")
+        if enable_ab_testing:
+            logger.info(f"   → A/B testing: {ab_test_split*100:.0f}% to fine-tuned model")
         logger.info("✅ C++ engine available" if _check_cpp_engine() else "⚠️  C++ engine not available")
         logger.info("🚀 FinRisk AI API ready to serve requests")
 

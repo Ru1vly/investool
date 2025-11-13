@@ -56,6 +56,14 @@ services:
       - PORT=8000
       - DEBUG=${DEBUG:-false}
       - LOG_LEVEL=${LOG_LEVEL:-info}
+
+      # Phase 5: Fine-Tuning & Data Collection
+      - ENABLE_DATA_COLLECTION=${ENABLE_DATA_COLLECTION:-true}
+      - DATA_COLLECTION_QUALITY=${DATA_COLLECTION_QUALITY:-0.9}
+      - ENABLE_FINETUNING=${ENABLE_FINETUNING:-false}
+      - FINETUNED_MODEL_NAME=${FINETUNED_MODEL_NAME:-}
+      - ENABLE_AB_TESTING=${ENABLE_AB_TESTING:-false}
+      - AB_TEST_TRAFFIC_SPLIT=${AB_TEST_TRAFFIC_SPLIT:-0.5}
     depends_on:
       postgres:
         condition: service_healthy
